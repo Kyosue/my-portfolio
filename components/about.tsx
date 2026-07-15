@@ -1,0 +1,72 @@
+import { expertise, site, skills } from "@/lib/portfolio-data";
+
+const skillGroups = [
+  { label: "Languages", items: skills.languages },
+  { label: "Frameworks", items: skills.frameworks },
+  { label: "Data", items: skills.databases },
+  { label: "Cloud", items: skills.cloud },
+  { label: "Tools", items: skills.tools },
+] as const;
+
+export function About() {
+  return (
+    <section id="studio" className="bg-foam">
+      <div className="shell py-20 sm:py-28">
+        <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
+          <div>
+            <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-sea">
+              03 — Studio
+            </p>
+            <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+              How I work
+            </h2>
+            <p className="mt-6 text-base leading-relaxed text-sea sm:text-lg">
+              {site.profile}
+            </p>
+          </div>
+
+          <div>
+            <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-sea">
+              Areas of expertise
+            </p>
+            <ul className="mt-5 columns-1 gap-x-10 sm:columns-2">
+              {expertise.map((item, i) => (
+                <li
+                  key={item}
+                  className="mb-3 break-inside-avoid border-b border-ink/10 pb-3 font-display text-base font-medium text-ink"
+                >
+                  <span className="mr-3 font-mono text-[0.65rem] text-sea">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-16 border-t border-ink/10 pt-14">
+          <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-sea">
+            Technical stack
+          </p>
+          <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+            {skillGroups.map((group) => (
+              <div key={group.label}>
+                <h3 className="font-display text-sm font-semibold text-ink">
+                  {group.label}
+                </h3>
+                <ul className="mt-3 space-y-1.5">
+                  {group.items.map((item) => (
+                    <li key={item} className="text-sm text-sea">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
