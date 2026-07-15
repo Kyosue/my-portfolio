@@ -92,18 +92,21 @@ export function Projects() {
     setProgress(Math.min(1, Math.max(0, ratio)));
   };
 
-  const settleIndex = () => {
-    const track = trackRef.current;
-    if (!track) return;
-    const next = measureIndex(track);
+  const applyIndex = (next: number) => {
     setIndex(next);
     if (next === projects.length - 1) setProgress(1);
     else if (next === 0) setProgress(0);
     else syncProgress();
+  };
+
+  const settleIndex = () => {
+    const track = trackRef.current;
+    if (!track) return;
+    applyIndex(measureIndex(track));
     programScroll.current = false;
   };
 
-  const scrollToIndex = (i: number) => {
+  const scrollToIndex = (i: number, behavior: ScrollBehavior = "smooth") => {
     const track = trackRef.current;
     const card = track?.querySelectorAll<HTMLElement>("[data-work-card]")[i];
     if (!track || !card) return;
@@ -125,10 +128,13 @@ export function Projects() {
       Math.max(0, track.scrollLeft + delta)
     );
 
-    track.scrollTo({ left: nextLeft, behavior: "smooth" });
+    track.scrollTo({ left: nextLeft, behavior });
 
     if (settleTimer.current) window.clearTimeout(settleTimer.current);
-    settleTimer.current = window.setTimeout(settleIndex, 420);
+    settleTimer.current = window.setTimeout(
+      settleIndex,
+      behavior === "smooth" ? 420 : 40
+    );
   };
 
   const scrollByCard = (dir: -1 | 1) => {
@@ -142,11 +148,15 @@ export function Projects() {
   };
 
   const onScroll = () => {
-    if (!programScroll.current) syncProgress();
-    if (programScroll.current) return;
+    const track = trackRef.current;
+    if (!track) return;
 
-    if (settleTimer.current) window.clearTimeout(settleTimer.current);
-    settleTimer.current = window.setTimeout(settleIndex, 80);
+    if (!programScroll.current) {
+      syncProgress();
+      // Keep active card in sync while dragging — don't wait for settle.
+      const next = measureIndex(track);
+      setIndex((prev) => (prev === next ? prev : next));
+    }
   };
 
   useEffect(() => {
@@ -157,6 +167,18 @@ export function Projects() {
     let startScroll = 0;
     let moved = false;
     let capturing = false;
+    let touchMoved = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const snapNow = () => {
+      const trackEl = trackRef.current;
+      if (!trackEl || programScroll.current) return;
+      // Kill momentum first so snap starts immediately on release.
+      trackEl.scrollTo({ left: trackEl.scrollLeft, behavior: "auto" });
+      const next = measureIndex(trackEl);
+      scrollToIndex(next);
+    };
 
     const onPointerDown = (e: PointerEvent) => {
       if (e.pointerType !== "mouse" || e.button !== 0) return;
@@ -199,19 +221,46 @@ export function Projects() {
       capturing = false;
       setDragging(false);
       if (moved) {
-        settleIndex();
+        snapNow();
       }
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      touchMoved = false;
+      touchStartX = e.touches[0]?.clientX ?? 0;
+      touchStartY = e.touches[0]?.clientY ?? 0;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      const x = e.touches[0]?.clientX ?? touchStartX;
+      const y = e.touches[0]?.clientY ?? touchStartY;
+      const dx = Math.abs(x - touchStartX);
+      const dy = Math.abs(y - touchStartY);
+      if (dx > 8 && dx > dy) touchMoved = true;
+    };
+
+    const onTouchEnd = () => {
+      if (!touchMoved) return;
+      snapNow();
     };
 
     track.addEventListener("pointerdown", onPointerDown);
     track.addEventListener("pointermove", onPointerMove);
     track.addEventListener("pointerup", onPointerUp);
     track.addEventListener("pointercancel", onPointerUp);
+    track.addEventListener("touchstart", onTouchStart, { passive: true });
+    track.addEventListener("touchmove", onTouchMove, { passive: true });
+    track.addEventListener("touchend", onTouchEnd, { passive: true });
+    track.addEventListener("touchcancel", onTouchEnd, { passive: true });
     return () => {
       track.removeEventListener("pointerdown", onPointerDown);
       track.removeEventListener("pointermove", onPointerMove);
       track.removeEventListener("pointerup", onPointerUp);
       track.removeEventListener("pointercancel", onPointerUp);
+      track.removeEventListener("touchstart", onTouchStart);
+      track.removeEventListener("touchmove", onTouchMove);
+      track.removeEventListener("touchend", onTouchEnd);
+      track.removeEventListener("touchcancel", onTouchEnd);
     };
   }, []);
 
@@ -281,7 +330,7 @@ export function Projects() {
                 key={project.name}
                 data-work-card
                 className={cn(
-                  "work-frame group relative flex min-h-[27rem] w-[min(86vw,26.5rem)] shrink-0 snap-start flex-col justify-between overflow-hidden border p-7 transition-[transform,opacity,background-color,border-color,box-shadow,color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:min-h-[30rem] sm:w-[29rem] sm:p-9",
+                  "work-frame group relative flex min-h-[27rem] w-[min(86vw,26.5rem)] shrink-0 snap-start snap-always flex-col justify-between overflow-hidden border p-7 transition-[transform,opacity,background-color,border-color,box-shadow,color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:min-h-[30rem] sm:w-[29rem] sm:p-9",
                   focused
                     ? "z-[1] scale-[1.02] border-ink bg-ink text-foam opacity-100 shadow-[0_28px_70px_rgba(11,18,32,0.22)]"
                     : "scale-[0.97] border-ink/10 bg-mist text-ink opacity-55 hover:border-ink/25 hover:opacity-80"
