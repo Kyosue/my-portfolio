@@ -25,6 +25,10 @@ export const metadata: Metadata = {
   title: "Reymund Abelgas — Software / Application Developer",
   description:
     "Full-Stack Developer building responsive web and mobile applications with React, React Native, Firebase, MongoDB, and PHP.",
+  icons: {
+    icon: [{ url: "/images/favicon.png", type: "image/png" }],
+    apple: [{ url: "/images/favicon.png" }],
+  },
 };
 
 export default function RootLayout({
