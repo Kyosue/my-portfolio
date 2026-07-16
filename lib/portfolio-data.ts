@@ -55,6 +55,7 @@ export const projects: Project[] = [
       "Digitized gate passes and travel requests with multi-stage approvals across campus sites.",
     stack: ["React Native", "Node.js", "MongoDB", "Socket.io"],
     logo: "/images/gopass.jpg",
+    url: "https://gopassdorsu.vercel.app/",
     highlights: [
       "Developed a production-ready platform for digitizing employee gate passes and official travel requests across multiple campus sites.",
       "Implemented supervisor-to-HR-to-security approval pipelines with digital signatures, QR verification, and policy-based time balances.",
