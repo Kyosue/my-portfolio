@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { ExternalLink } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { projects, type Project } from "@/lib/portfolio-data";
 import { cn } from "@/lib/utils";
@@ -583,13 +584,31 @@ export function Projects() {
             </div>
 
             <div className="border-t border-ink/10 px-6 py-4 sm:px-8">
-              <button
-                type="button"
-                onClick={() => setActive(null)}
-                className="inline-flex h-11 w-full items-center justify-center bg-ink text-sm font-medium text-foam transition-colors hover:bg-sea-mid"
-              >
-                Close panel
-              </button>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                {active.url ? (
+                  <a
+                    href={active.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-11 flex-1 items-center justify-center gap-2 bg-ink text-sm font-medium text-foam transition-colors hover:bg-sea-mid"
+                  >
+                    Visit live site
+                    <ExternalLink className="size-3.5" strokeWidth={1.75} aria-hidden />
+                  </a>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => setActive(null)}
+                  className={cn(
+                    "inline-flex h-11 items-center justify-center text-sm font-medium transition-colors",
+                    active.url
+                      ? "flex-1 border border-ink/15 text-ink hover:border-ink hover:bg-mist"
+                      : "w-full bg-ink text-foam hover:bg-sea-mid"
+                  )}
+                >
+                  Close panel
+                </button>
+              </div>
             </div>
           </aside>
         </div>

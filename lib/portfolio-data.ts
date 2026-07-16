@@ -29,6 +29,7 @@ export type Project = {
   stack: string[];
   highlights: string[];
   logo?: string;
+  url?: string;
 };
 
 export const projects: Project[] = [
@@ -39,6 +40,7 @@ export const projects: Project[] = [
       "Cross-platform disaster response for agencies — live ops, maps, IoT weather, offline field sync.",
     stack: ["React Native", "Expo", "TypeScript", "Firebase", "Cloudinary"],
     logo: "/images/Respondr.png",
+    url: "https://respondr-da5cb.web.app/",
     highlights: [
       "Engineered a cross-platform disaster response system for emergency agencies to coordinate resources, operations, and situation reports in real time.",
       "Built map-driven incident workflows with resource borrowing, personnel assignment, and automated SitRep document generation.",
@@ -66,6 +68,7 @@ export const projects: Project[] = [
       "QR attendance for 70 school sections with geofenced presence and exportable reports.",
     stack: ["React Native", "Expo", "TypeScript", "Firebase", "Leaflet"],
     logo: "/images/logo.png",
+    url: "https://attendify-pnhs.web.app/",
     highlights: [
       "Built a cross-platform attendance platform for high-school admins and students across 70 sections with role-gated SuperAdmin, Admin, and Student workflows.",
       "Delivered QR scan check-in/out, morning/afternoon session tracking, and Excel report exports filtered by date, grade, and section.",
