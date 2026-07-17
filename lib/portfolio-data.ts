@@ -1,6 +1,6 @@
 export const site = {
   name: "Reymund Abelgas",
-  role: "Software / Application Developer",
+  role: "Full-Stack Software Developer",
   location: "City of Mati, Davao Region 8200, Philippines",
   email: "reymund216@gmail.com",
   phone: "+63 9452138300",
