@@ -1,6 +1,8 @@
 import Image from "next/image";
+import { GraduationCap } from "lucide-react";
 import { education, experience } from "@/lib/portfolio-data";
 import { TechBackdrop } from "@/components/tech-backdrop";
+import { cn } from "@/lib/utils";
 
 export function Experience() {
   return (
@@ -11,21 +13,34 @@ export function Experience() {
           <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-sea">
             02 — Path
           </p>
-          <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+          <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl lg:text-4xl">
             Experience &amp; education
           </h2>
         </div>
 
         <ol className="relative space-y-0">
+          <div
+            className="absolute bottom-0 left-[0.4375rem] top-3 w-px bg-ink/15 md:left-[calc(10rem+0.4375rem)]"
+            aria-hidden
+          />
+
           {experience.map((job, index) => (
             <li
               key={`${job.org}-${job.title}`}
-              className="grid gap-4 border-t border-ink/10 py-10 md:grid-cols-[10rem_1fr] lg:grid-cols-[10rem_16rem_1fr] lg:gap-10"
+              className="relative grid gap-4 py-10 md:grid-cols-[10rem_1fr] lg:grid-cols-[10rem_16rem_1fr] lg:gap-10"
             >
-              <p className="font-mono text-xs text-sea tabular-nums md:pt-1">
+              <div
+                className={cn(
+                  "absolute left-0 top-[2.85rem] z-[1] size-2.5 rounded-full border-2 border-mist bg-ink md:left-40",
+                  index === 0 && "ring-4 ring-ink/10"
+                )}
+                aria-hidden
+              />
+
+              <p className="pl-6 font-mono text-xs text-sea tabular-nums md:pl-0 md:pt-1">
                 {job.period}
               </p>
-              <div>
+              <div className="pl-6 md:pl-0">
                 <h3 className="font-display text-xl font-semibold text-ink sm:text-2xl">
                   {job.title}
                 </h3>
@@ -40,7 +55,7 @@ export function Experience() {
                   </p>
                 ) : null}
               </div>
-              <ul className="space-y-2.5 md:col-span-2 lg:col-span-1">
+              <ul className="space-y-2.5 pl-6 md:col-span-2 md:pl-0 lg:col-span-1">
                 {job.bullets.map((bullet) => (
                   <li
                     key={bullet}
@@ -54,10 +69,15 @@ export function Experience() {
           ))}
         </ol>
 
-        <div className="mt-4 grid gap-8 border-t border-ink/10 bg-foam px-6 py-10 sm:gap-10 sm:px-8 lg:grid-cols-[10rem_minmax(0,1fr)_13rem] lg:items-center">
-          <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-sea">
-            Education
-          </p>
+        <div className="relative mt-4 grid gap-8 border-t border-ink/10 bg-foam px-6 py-10 sm:gap-10 sm:px-8 lg:grid-cols-[10rem_minmax(0,1fr)_13rem] lg:items-center">
+          <div className="flex items-center gap-3">
+            <span className="flex size-9 shrink-0 items-center justify-center border border-ink/15 text-ink">
+              <GraduationCap className="size-4" strokeWidth={1.75} aria-hidden />
+            </span>
+            <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-sea">
+              Education
+            </p>
+          </div>
           <div>
             <h3 className="font-display text-xl font-semibold text-ink sm:text-2xl">
               {education.degree}

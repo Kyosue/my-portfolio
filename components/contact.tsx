@@ -10,7 +10,7 @@ export function Contact() {
           <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-white/45">
             04 — Contact
           </p>
-          <h2 className="mt-4 font-display text-4xl font-semibold tracking-tight sm:text-6xl">
+          <h2 className="mt-4 font-display text-2xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
             Tell me what you&apos;re building
           </h2>
           <p className="mt-5 max-w-md text-base text-white/55">

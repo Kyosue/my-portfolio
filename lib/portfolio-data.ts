@@ -11,97 +11,184 @@ export const site = {
     "Full-Stack Developer with hands-on experience developing responsive web and mobile applications using React, React Native, JavaScript, PHP, Firebase, MongoDB, and MySQL. Experienced in building end-to-end software solutions, integrating APIs, optimizing application performance, and collaborating with clients to deliver reliable products. Passionate about creating scalable applications and continuously learning modern technologies.",
 } as const;
 
-export const expertise = [
-  "UI/UX Design",
-  "Full-Stack Development",
-  "Database Design & Management",
-  "Mobile Application Development",
-  "Web Application Development",
-  "REST API Integration",
-  "Responsive Web Design",
-  "Cloud Deployment",
-] as const;
+export type ProjectStack = {
+  frontend?: string[];
+  backend?: string[];
+  infra?: string[];
+};
+
+export type ProjectKind = "Capstone" | "Freelance" | "School Project";
 
 export type Project = {
   name: string;
   role: string;
+  kind: ProjectKind;
   summary: string;
-  stack: string[];
+  stack: ProjectStack;
   highlights: string[];
   logo?: string;
   url?: string;
 };
 
+export const stackLayers = [
+  { key: "frontend", label: "Frontend" },
+  { key: "backend", label: "Backend" },
+  { key: "infra", label: "Infra" },
+] as const satisfies ReadonlyArray<{
+  key: keyof ProjectStack;
+  label: string;
+}>;
+
+export function getStackLayers(stack: ProjectStack) {
+  return stackLayers.filter(({ key }) => (stack[key]?.length ?? 0) > 0);
+}
+
+export function getStackPreview(stack: ProjectStack, limit = 5) {
+  const items = [
+    ...(stack.frontend ?? []),
+    ...(stack.backend ?? []),
+    ...(stack.infra ?? []),
+  ];
+  return items.slice(0, limit);
+}
+
 export const projects: Project[] = [
   {
     name: "RESPONDR",
     role: "Full-Stack Developer",
+    kind: "Capstone",
     summary:
-      "Cross-platform disaster response for agencies — live ops, maps, IoT weather, offline field sync.",
-    stack: ["React Native", "Expo", "TypeScript", "Firebase", "Cloudinary"],
+      "Disaster response for PDRRMO — offline resource ops, live municipal maps, and automated SitReps.",
+    stack: {
+      frontend: [
+        "Expo",
+        "React Native",
+        "TypeScript",
+        "Expo Router",
+        "Leaflet",
+        "GeoJSON",
+        "Reanimated",
+        "AsyncStorage",
+        "SecureStore",
+        "NetInfo",
+        "SheetJS",
+      ],
+      backend: [
+        "Firebase Auth",
+        "Firestore",
+        "Cloud Storage",
+        "Cloud Functions",
+        "Cloudinary",
+      ],
+      infra: ["Firebase Hosting", "EAS"],
+    },
     logo: "/images/Respondr.png",
     url: "https://respondr-da5cb.web.app/",
     highlights: [
-      "Engineered a cross-platform disaster response system for emergency agencies to coordinate resources, operations, and situation reports in real time.",
-      "Built map-driven incident workflows with resource borrowing, personnel assignment, and automated SitRep document generation.",
-      "Integrated custom IoT weather stations over Firebase Realtime Database with live sensor ingestion, threshold alerting, and historical analytics.",
-      "Shipped iOS, Android, and web builds with Firestore sync, offline-first queuing, and resilient field operations in low-connectivity environments.",
+      "Engineered an offline-first sync layer with NetInfo, AsyncStorage operation queues, and SyncManager exponential backoff so responders keep logging resource transactions when cellular coverage drops.",
+      "Built municipality-level operations maps on Leaflet + OpenStreetMap (DOM Leaflet on web, WebView-injected on native) with Firestore onSnapshot listeners for live active vs. concluded sites across Davao Oriental.",
+      "Implemented admin / supervisor / operator RBAC with Expo SecureStore session restore and Firebase callable Cloud Functions for user provisioning—preventing client-side createUser from hijacking the admin Auth session.",
+      "Delivered SitRep Word-compatible HTML .doc export (letterhead, base64 images, multi-section casualty data) and PAGASA-aligned rainfall advisories with on-device multivariate regression plus SheetJS Excel export.",
     ],
   },
   {
     name: "Campus Mobility Platform",
     role: "Full-Stack Developer",
+    kind: "Freelance",
     summary:
-      "Digitized gate passes and travel requests with multi-stage approvals across campus sites.",
-    stack: ["React Native", "Node.js", "MongoDB", "Socket.io"],
+      "Campus leave and travel authorization for DOrSU — role-gated approvals, gate QR, and weekly balances.",
+    stack: {
+      frontend: [
+        "Expo",
+        "React",
+        "TypeScript",
+        "NativeWind",
+        "Axios",
+        "Leaflet",
+        "Socket.IO",
+      ],
+      backend: [
+        "Express",
+        "MongoDB",
+        "Mongoose",
+        "JWT",
+        "bcrypt",
+        "Socket.IO",
+        "Cloudinary",
+        "Nodemailer",
+      ],
+      infra: ["Render", "Vercel", "EAS"],
+    },
     logo: "/images/gopass.jpg",
     url: "https://gopassdorsu.vercel.app/",
     highlights: [
-      "Developed a production-ready platform for digitizing employee gate passes and official travel requests across multiple campus sites.",
-      "Implemented supervisor-to-HR-to-security approval pipelines with digital signatures, QR verification, and policy-based time balances.",
-      "Delivered real-time dashboards and notifications; deployed mobile, web, and API tiers to cloud hosting.",
+      "Architected a split-client platform (Expo mobile for employees/approvers/security; Expo web HR console on Vercel; Express API on Render) with JWT auth, bcrypt credentials, and route-level authorize middleware across nine campus roles.",
+      "Implemented seconds-based weekly leave accounting (default 120-minute allotment) with MongoDB balance state, Monday node-cron resets, HR-time reservation on approval, early-return credit/overdue debit, and Asia/Manila server-time sync.",
+      "Delivered dual realtime channels—Socket.IO on mobile and SSE via MongoDB Change Streams on web—plus expo-camera QR scans that advance slips Approved → Verified → Returned at the gate while reconciling leave balance.",
+      "Enforced city-bounded pass slips with ray-casting against a Mati City PSGC GeoJSON boundary, OSRM driving routes, Leaflet destination maps, canvas signature capture, Cloudinary attachments, and OIC signer delegation.",
     ],
   },
   {
     name: "Attendify",
     role: "Full-Stack Developer",
+    kind: "Freelance",
     summary:
-      "QR attendance for 70 school sections with geofenced presence and exportable reports.",
-    stack: ["React Native", "Expo", "TypeScript", "Firebase", "Leaflet"],
+      "School attendance for Pantukan NHS — secure QR check-in, campus geofencing, and grade/section reports.",
+    stack: {
+      frontend: ["Expo", "React", "TypeScript", "Leaflet", "SheetJS", "Jest"],
+      backend: ["Firebase", "Firestore"],
+    },
     logo: "/images/logo.png",
     url: "https://attendify-pnhs.web.app/",
     highlights: [
-      "Built a cross-platform attendance platform for high-school admins and students across 70 sections with role-gated SuperAdmin, Admin, and Student workflows.",
-      "Delivered QR scan check-in/out, morning/afternoon session tracking, and Excel report exports filtered by date, grade, and section.",
-      "Integrated signed QR validation, KML geofence campus maps, Firestore real-time presence, and background location tracking.",
-      "Deployed via Firebase Hosting and EAS with Cloud Functions for privileged user ops, throttled writes, and exponential backoff retry logic.",
+      "Engineered campus geofencing and live presence on Leaflet + OpenStreetMap with KML/GeoJSON polygon checks (ray-casting + Haversine), throttled Firestore location writes (~30s / 12m), and expo-task-manager background GPS.",
+      "Built HMAC-signed, versioned QR attendance (ATDFY1 payloads) with an Admin-only expo-camera scanner that records morning/afternoon time-in/out—including late cutoffs (7:30 AM / 1:00 PM)—then generates weekday-aware grade/section Excel workbooks via SheetJS.",
+      "Implemented SuperAdmin / Admin / Student RBAC with Expo SecureStore session restore, Firestore security rules, and a SuperAdmin-only callable Cloud Function (deleteAuthUser) so privileged deletes stay server-enforced.",
+      "Delivered school-scale realtime UX with capped Firestore onSnapshot presence listeners, throttled online/offline sync across AppState and web tab visibility, and role-gated Expo Router navigation unlocked only after a successful profile fetch.",
     ],
   },
   {
     name: "Barangay Business Permit Tracking System",
     role: "Full-Stack Developer",
+    kind: "Freelance",
     summary:
-      "End-to-end permit workflow for applicants and BLPO staff on a LAMP stack.",
-    stack: ["PHP", "MySQL", "JavaScript", "HTML/CSS", "PDO"],
+      "Barangay business clearance for Marayag — online applications, LGC-aligned renewals, and printable permits.",
+    stack: {
+      frontend: ["HTML", "CSS", "JavaScript"],
+      backend: ["PHP", "MySQL", "PDO"],
+    },
     highlights: [
-      "Developed a digital business permit management platform for a Barangay serving business applicants and BLPO staff through centralized application management.",
-      "Designed a multi-status workflow from submission through payment and approval with document uploads and role-scoped dashboards.",
-      "Built automated permit numbering, RA 7160 compliant renewal rules, and on-demand printable permit certificates.",
-      "Delivered on LAMP with full audit trails, cron-based renewal reminders, and live notifications via AJAX polling.",
+      "Engineered a nine-state permit lifecycle (submitted → under_review → on_hold → for_payment → payment_confirmed → approved / released / rejected / revoked) with PDO status updates that auto-assign BBC-YYYY-MM-NNNNN numbers and force Dec 31 expiry only on approval.",
+      "Implemented admin / staff / applicant RBAC with PHP sessions, password_hash / password_verify, and require_role guards, plus admin-safe user CRUD that blocks self-deletion and removal of the last admin while writing changes to a paginated audit log.",
+      "Built RA 7160–aligned renewal flows and a schedulable cron_reminders.php endpoint that notifies owners in December before Dec 31 expiry and again during January 1–20 if no renewal application exists.",
+      "Delivered printable Barangay Business Clearance certificates (HTML print with O.R. and payment amount), multi-file uploads with basename-sanitized downloads, and near–real-time in-app alerts via 5-second JSON polling.",
     ],
   },
   {
     name: "Vetra",
     role: "Full-Stack Developer",
+    kind: "School Project",
     summary:
-      "Offline-first mobile POS for retailers — cart, inventory, and PDF sales reports.",
-    stack: ["React Native", "Expo", "TypeScript", "SQLite", "Expo Router"],
+      "Offline-first POS for small businesses — SQLite inventory & sales, on-device receipts, and printable reports.",
+    stack: {
+      frontend: [
+        "Expo",
+        "React Native",
+        "TypeScript",
+        "Expo Router",
+        "Camera",
+        "Print",
+        "ViewShot",
+      ],
+      backend: ["SQLite", "AsyncStorage"],
+      infra: ["Android"],
+    },
     logo: "/images/vetra-app-icon.png",
     highlights: [
-      "Built an offline-first mobile POS for small retailers to manage sales and inventory without network dependency.",
-      "Delivered cart-based checkout with stock validation, inventory decrement, and shareable receipt capture.",
-      "Designed SQLite schema and service layer for products, sales, authentication, and business profiles.",
-      "Shipped native Android build with PDF report export for daily, weekly, and monthly sales insights.",
+      "Architected an offline-first POS data layer on expo-sqlite (products, sales, users, business_profiles) with transactional sale writes that decrement stock and reject under-stocked checkouts when internet is unavailable.",
+      "Built a cart-driven checkout flow with category filters, search/sort, and multi-item cart state, then captured receipts via react-native-view-shot + expo-file-system/MediaLibrary/Sharing for on-device PNG save and share.",
+      "Implemented local auth and business onboarding (SQLite user validation + AsyncStorage session) with field-level validation for retail profiles, enabling fully device-side registration and login.",
+      "Delivered sales analytics (daily/weekly/monthly totals, low-stock and out-of-stock counts) and HTML-to-PDF export through expo-print, with Android Downloads persistence and iOS share-sheet handoff.",
     ],
   },
 ];
