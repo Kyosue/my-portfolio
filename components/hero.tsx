@@ -59,7 +59,7 @@ export function Hero() {
         <div className="min-w-0">
           <div
             className="animate-rise space-y-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-x-4 sm:space-y-0"
-            style={{ animationDelay: "40ms" }}
+            style={{ animationDelay: "20ms" }}
           >
             <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-sea sm:text-[0.7rem] sm:tracking-[0.2em]">
               {site.role}
@@ -72,7 +72,7 @@ export function Hero() {
 
           <h1
             className="animate-rise mt-5 font-display text-[clamp(2.75rem,13vw,7rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-ink sm:mt-6 sm:leading-[0.88]"
-            style={{ animationDelay: "90ms" }}
+            style={{ animationDelay: "50ms" }}
           >
             {firstName}
             <br />
@@ -81,14 +81,14 @@ export function Hero() {
 
           <p
             className="animate-rise mt-6 max-w-xl text-base leading-relaxed text-sea sm:mt-8 sm:text-lg lg:text-xl"
-            style={{ animationDelay: "150ms" }}
+            style={{ animationDelay: "90ms" }}
           >
             {site.tagline}
           </p>
 
           <div
             className="animate-rise mt-8 grid grid-cols-1 gap-2.5 sm:mt-12 sm:flex sm:flex-row sm:items-center sm:gap-3"
-            style={{ animationDelay: "210ms" }}
+            style={{ animationDelay: "120ms" }}
           >
             <a
               href="#work"
@@ -107,7 +107,7 @@ export function Hero() {
 
         <aside
           className="animate-rise border-t border-ink/15 pt-7 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0"
-          style={{ animationDelay: "260ms" }}
+          style={{ animationDelay: "150ms" }}
         >
           {/* Mobile: compact stacked meta */}
           <div className="space-y-5 lg:hidden">

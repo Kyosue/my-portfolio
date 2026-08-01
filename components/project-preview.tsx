@@ -41,7 +41,7 @@ export function ProjectMark({
   return (
     <div
       className={cn(
-        "relative shrink-0 overflow-hidden rounded-full border border-ink/10 bg-white transition-transform duration-300 group-hover:scale-105 group-active:scale-105",
+        "relative shrink-0 overflow-hidden rounded-full border border-ink/10 bg-white",
         dim,
         className
       )}

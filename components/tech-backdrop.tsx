@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 type TechBackdropProps = {
@@ -11,14 +12,30 @@ export function TechBackdrop({
   className,
   variant = "hero",
 }: TechBackdropProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(false);
   const dense = variant === "hero";
   const onDark = variant === "dark";
 
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => setActive(entry.isIntersecting),
+      { rootMargin: "80px", threshold: 0 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div
+      ref={rootRef}
       className={cn(
         "tech-backdrop pointer-events-none absolute inset-0",
         onDark && "tech-backdrop--dark",
+        active && "tech-backdrop--active",
         className
       )}
       aria-hidden

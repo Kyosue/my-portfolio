@@ -93,6 +93,8 @@ function ProjectDetailSheet({
     offset: 0,
   });
   const closingRef = useRef(false);
+  const rafRef = useRef(0);
+  const pendingYRef = useRef(0);
 
   const applyOffset = (y: number, animated: boolean) => {
     const sheet = sheetRef.current;
@@ -101,14 +103,14 @@ function ProjectDetailSheet({
 
     dragRef.current.offset = y;
     sheet.style.transition = animated
-      ? "transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)"
+      ? "transform 0.22s cubic-bezier(0.22, 1, 0.36, 1)"
       : "none";
     sheet.style.transform =
       y > 0 ? `translate3d(0, ${y}px, 0)` : "translate3d(0, 0, 0)";
 
     if (backdrop) {
       const fade = Math.max(0, 1 - y / Math.max(sheet.offsetHeight * 0.75, 1));
-      backdrop.style.transition = animated ? "opacity 0.3s ease" : "none";
+      backdrop.style.transition = animated ? "opacity 0.22s ease" : "none";
       backdrop.style.opacity = String(fade);
     }
   };
@@ -136,7 +138,7 @@ function ProjectDetailSheet({
       finishClose();
     };
     sheet.addEventListener("transitionend", onEnd);
-    window.setTimeout(finishClose, 340);
+    window.setTimeout(finishClose, 260);
   };
 
   const onHandlePointerDown = (e: React.PointerEvent) => {
@@ -165,13 +167,25 @@ function ProjectDetailSheet({
     drag.vy = (e.clientY - drag.lastY) / dt;
     drag.lastY = e.clientY;
     drag.lastT = now;
-    applyOffset(dy, false);
+    pendingYRef.current = dy;
+
+    if (rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = 0;
+      applyOffset(pendingYRef.current, false);
+    });
   };
 
   const onHandlePointerUp = () => {
     const drag = dragRef.current;
     if (!drag.tracking) return;
     drag.tracking = false;
+
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+      applyOffset(pendingYRef.current, false);
+    }
 
     const shouldClose =
       drag.offset > DISMISS_DISTANCE || drag.vy > DISMISS_VELOCITY;
@@ -378,18 +392,14 @@ export function Projects() {
 
         <ul className="mt-2 sm:mt-6">
           {projects.map((project, i) => (
-            <li
-              key={project.name}
-              className="animate-rise"
-              style={{ animationDelay: `${80 + i * 70}ms` }}
-            >
+            <li key={project.name}>
               <button
                 type="button"
                 onClick={() => setActive(project)}
-                className="group relative w-full border-b border-ink/10 px-0 py-6 text-left transition-colors first:border-t first:border-ink/10 hover:bg-foam active:bg-foam sm:py-10"
+                className="group relative w-full border-b border-ink/10 px-0 py-6 text-left transition-colors duration-150 first:border-t first:border-ink/10 hover:bg-foam active:bg-foam sm:py-10"
               >
                 <span
-                  className="absolute inset-y-0 left-0 w-0.5 origin-top scale-y-0 bg-ink transition-transform duration-300 group-active:scale-y-100 sm:group-hover:scale-y-100"
+                  className="absolute inset-y-0 left-0 w-0.5 origin-top scale-y-0 bg-ink transition-transform duration-200 group-active:scale-y-100 sm:group-hover:scale-y-100"
                   aria-hidden
                 />
 

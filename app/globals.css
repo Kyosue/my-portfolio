@@ -237,7 +237,7 @@ html.theme-transition *::after {
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(1rem);
+    transform: translateY(0.5rem);
   }
   to {
     opacity: 1;
@@ -246,7 +246,7 @@ html.theme-transition *::after {
 }
 
 .animate-rise {
-  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .nav-menu {
@@ -280,6 +280,8 @@ html.theme-transition *::after {
 .tech-backdrop {
   overflow: hidden;
   color: var(--ink);
+  contain: paint;
+  transform: translateZ(0);
 }
 
 .tech-backdrop--dark {
@@ -340,12 +342,17 @@ html.theme-transition *::after {
     transparent
   );
   animation: tech-scan 9s ease-in-out infinite;
+  animation-play-state: paused;
+  will-change: transform, opacity;
 }
 
 .tech-orbit {
   position: absolute;
   border: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
   border-radius: 9999px;
+  animation: tech-spin 48s linear infinite;
+  animation-play-state: paused;
+  will-change: transform;
 }
 
 .tech-orbit--a {
@@ -353,7 +360,6 @@ html.theme-transition *::after {
   height: min(42vw, 28rem);
   right: -6%;
   top: 12%;
-  animation: tech-spin 48s linear infinite;
 }
 
 .tech-orbit--b {
@@ -362,7 +368,8 @@ html.theme-transition *::after {
   right: 8%;
   top: 28%;
   border-style: dashed;
-  animation: tech-spin 36s linear infinite reverse;
+  animation-duration: 36s;
+  animation-direction: reverse;
 }
 
 .tech-node {
@@ -373,6 +380,14 @@ html.theme-transition *::after {
   background: var(--ink);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--ink) 8%, transparent);
   animation: tech-pulse 3.6s ease-in-out infinite;
+  animation-play-state: paused;
+  will-change: transform, opacity;
+}
+
+.tech-backdrop--active .tech-scan,
+.tech-backdrop--active .tech-orbit,
+.tech-backdrop--active .tech-node {
+  animation-play-state: running;
 }
 
 .tech-node--1 {
@@ -488,10 +503,10 @@ html.theme-transition *::after {
 
 @media (max-width: 767px) {
   .tech-code,
-  .tech-circuit {
-    display: none;
-  }
-  .tech-orbit--b {
+  .tech-circuit,
+  .tech-scan,
+  .tech-orbit,
+  .tech-node {
     display: none;
   }
 }
@@ -510,21 +525,19 @@ html.theme-transition *::after {
 }
 
 .work-panel-backdrop {
-  animation: work-backdrop-in 0.4s ease both;
-  backdrop-filter: blur(2px);
+  animation: work-backdrop-in 0.22s ease both;
 }
 
 .work-panel {
-  animation: work-sheet-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
-  box-shadow: 0 -16px 48px color-mix(in srgb, var(--sea-deep) 28%, transparent);
-  will-change: transform;
+  animation: work-sheet-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  box-shadow: 0 -12px 32px color-mix(in srgb, var(--sea-deep) 22%, transparent);
   transform: translate3d(0, 0, 0);
 }
 
 @media (min-width: 640px) {
   .work-panel {
     animation-name: work-panel-in;
-    box-shadow: -24px 0 80px color-mix(in srgb, var(--sea-deep) 40%, transparent);
+    box-shadow: -16px 0 48px color-mix(in srgb, var(--sea-deep) 32%, transparent);
   }
 }
 
