@@ -505,9 +505,17 @@ html.theme-transition *::after {
 }
 
 .work-panel {
-  animation: work-panel-in 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
-  box-shadow: -24px 0 80px color-mix(in srgb, var(--sea-deep) 40%, transparent);
+  animation: work-sheet-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  box-shadow: 0 -16px 48px color-mix(in srgb, var(--sea-deep) 28%, transparent);
   will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (min-width: 640px) {
+  .work-panel {
+    animation-name: work-panel-in;
+    box-shadow: -24px 0 80px color-mix(in srgb, var(--sea-deep) 40%, transparent);
+  }
 }
 
 @keyframes work-backdrop-in {
@@ -516,6 +524,15 @@ html.theme-transition *::after {
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes work-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
   }
 }
 

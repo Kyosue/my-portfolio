@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ExternalLink } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   getStackLayers,
   getStackPreview,
@@ -10,15 +10,27 @@ import {
   type Project,
   type ProjectStack,
 } from "@/lib/portfolio-data";
-import { cn } from "@/lib/utils";
 
-function ProjectStackPreview({ stack }: { stack: ProjectStack }) {
-  const preview = getStackPreview(stack);
+function ProjectStackPreview({
+  stack,
+  limit = 6,
+}: {
+  stack: ProjectStack;
+  limit?: number;
+}) {
+  const preview = getStackPreview(stack, limit);
 
   return (
-    <p className="font-mono text-[0.8125rem] font-medium leading-relaxed tracking-[0.02em] text-ink/70">
-      {preview.join("  ·  ")}
-    </p>
+    <div className="flex flex-wrap gap-1.5">
+      {preview.map((tech) => (
+        <span
+          key={tech}
+          className="border border-ink/12 px-2 py-0.5 font-mono text-[0.7rem] font-medium text-ink/75"
+        >
+          {tech}
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -28,8 +40,11 @@ function ProjectStackDetail({ stack }: { stack: ProjectStack }) {
   return (
     <div className="space-y-5">
       {layers.map(({ key, label }) => (
-        <div key={key} className="grid grid-cols-[5.5rem_1fr] gap-x-4 gap-y-2">
-          <p className="pt-1.5 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-sea">
+        <div
+          key={key}
+          className="grid gap-2 sm:grid-cols-[5.5rem_1fr] sm:gap-x-4 sm:gap-y-2"
+        >
+          <p className="font-mono text-[0.7rem] uppercase tracking-[0.14em] text-sea sm:pt-1.5">
             {label}
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -44,6 +59,264 @@ function ProjectStackDetail({ stack }: { stack: ProjectStack }) {
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+const DISMISS_DISTANCE = 120;
+const DISMISS_VELOCITY = 0.65;
+
+function isMobileSheet() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(max-width: 639px)").matches
+  );
+}
+
+function ProjectDetailSheet({
+  project,
+  onClose,
+}: {
+  project: Project;
+  onClose: () => void;
+}) {
+  const sheetRef = useRef<HTMLElement>(null);
+  const backdropRef = useRef<HTMLButtonElement>(null);
+  const dragRef = useRef({
+    tracking: false,
+    startY: 0,
+    lastY: 0,
+    lastT: 0,
+    vy: 0,
+    offset: 0,
+  });
+  const closingRef = useRef(false);
+
+  const applyOffset = (y: number, animated: boolean) => {
+    const sheet = sheetRef.current;
+    const backdrop = backdropRef.current;
+    if (!sheet) return;
+
+    dragRef.current.offset = y;
+    sheet.style.transition = animated
+      ? "transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)"
+      : "none";
+    sheet.style.transform =
+      y > 0 ? `translate3d(0, ${y}px, 0)` : "translate3d(0, 0, 0)";
+
+    if (backdrop) {
+      const fade = Math.max(0, 1 - y / Math.max(sheet.offsetHeight * 0.75, 1));
+      backdrop.style.transition = animated ? "opacity 0.3s ease" : "none";
+      backdrop.style.opacity = String(fade);
+    }
+  };
+
+  const finishClose = () => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    onClose();
+  };
+
+  const dismissSheet = () => {
+    if (!isMobileSheet()) {
+      finishClose();
+      return;
+    }
+    const sheet = sheetRef.current;
+    if (!sheet) {
+      finishClose();
+      return;
+    }
+    applyOffset(sheet.offsetHeight + 24, true);
+    const onEnd = (e: TransitionEvent) => {
+      if (e.propertyName !== "transform") return;
+      sheet.removeEventListener("transitionend", onEnd);
+      finishClose();
+    };
+    sheet.addEventListener("transitionend", onEnd);
+    window.setTimeout(finishClose, 340);
+  };
+
+  const onHandlePointerDown = (e: React.PointerEvent) => {
+    if (!isMobileSheet() || closingRef.current) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+
+    const drag = dragRef.current;
+    drag.tracking = true;
+    drag.startY = e.clientY;
+    drag.lastY = e.clientY;
+    drag.lastT = performance.now();
+    drag.vy = 0;
+
+    const sheet = sheetRef.current;
+    sheet?.style.setProperty("animation", "none");
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const onHandlePointerMove = (e: React.PointerEvent) => {
+    const drag = dragRef.current;
+    if (!drag.tracking) return;
+
+    const now = performance.now();
+    const dy = Math.max(0, e.clientY - drag.startY);
+    const dt = Math.max(now - drag.lastT, 1);
+    drag.vy = (e.clientY - drag.lastY) / dt;
+    drag.lastY = e.clientY;
+    drag.lastT = now;
+    applyOffset(dy, false);
+  };
+
+  const onHandlePointerUp = () => {
+    const drag = dragRef.current;
+    if (!drag.tracking) return;
+    drag.tracking = false;
+
+    const shouldClose =
+      drag.offset > DISMISS_DISTANCE || drag.vy > DISMISS_VELOCITY;
+
+    if (shouldClose) {
+      dismissSheet();
+      return;
+    }
+    applyOffset(0, true);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-stretch sm:justify-end">
+      <button
+        ref={backdropRef}
+        type="button"
+        aria-label="Close details"
+        className="work-panel-backdrop absolute inset-0 bg-ink/45"
+        onClick={dismissSheet}
+      />
+      <aside
+        ref={sheetRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="work-panel-title"
+        className="work-panel relative z-10 flex h-[min(92dvh,100%)] w-full max-w-lg flex-col rounded-t-2xl border border-ink/10 bg-foam touch-pan-y sm:h-full sm:rounded-none sm:border-l sm:border-r-0 sm:border-t-0 sm:border-b-0 sm:touch-auto"
+      >
+        <div
+          className="shrink-0 touch-none sm:contents"
+          onPointerDown={onHandlePointerDown}
+          onPointerMove={onHandlePointerMove}
+          onPointerUp={onHandlePointerUp}
+          onPointerCancel={onHandlePointerUp}
+        >
+          <div
+            className="flex cursor-grab justify-center pt-3 active:cursor-grabbing sm:hidden"
+            aria-hidden
+          >
+            <span className="h-1.5 w-12 rounded-full bg-ink/20" />
+          </div>
+
+          <div className="flex items-start justify-between gap-3 border-b border-ink/10 px-5 pb-4 pt-3 sm:gap-4 sm:px-8 sm:py-5">
+            <div className="flex min-w-0 flex-1 items-start gap-3">
+              <div className="relative size-11 shrink-0 overflow-hidden rounded-full border border-ink/10 bg-white sm:size-12">
+                {project.logo ? (
+                  <Image
+                    src={project.logo}
+                    alt={`${project.name} logo`}
+                    fill
+                    sizes="48px"
+                    className="object-contain p-1.5"
+                    draggable={false}
+                  />
+                ) : (
+                  <span
+                    className="flex size-full items-center justify-center font-mono text-[0.7rem] font-medium text-sea"
+                    aria-hidden
+                  >
+                    {project.name.slice(0, 2).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="border border-ink/15 px-2 py-0.5 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-ink/70">
+                    {project.kind}
+                  </span>
+                  {project.url ? (
+                    <span className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-sea">
+                      Live
+                    </span>
+                  ) : null}
+                </div>
+                <h3
+                  id="work-panel-title"
+                  className="mt-2 font-display text-xl font-semibold tracking-tight text-ink sm:text-3xl"
+                >
+                  {project.name}
+                </h3>
+                <p className="mt-1 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-sea">
+                  {project.role}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={dismissSheet}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="flex size-10 shrink-0 items-center justify-center border border-ink/15 text-ink transition-colors hover:border-ink hover:bg-mist sm:size-9"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-6 sm:px-8 sm:py-8">
+          <p className="text-base leading-relaxed text-sea">{project.summary}</p>
+
+          <h4 className="mt-8 font-display text-lg font-semibold tracking-tight text-ink sm:mt-10 sm:text-xl">
+            Technical stack
+          </h4>
+          <div className="mt-4 sm:mt-5">
+            <ProjectStackDetail stack={project.stack} />
+          </div>
+
+          <h4 className="mt-8 font-display text-lg font-semibold tracking-tight text-ink sm:mt-10 sm:text-xl">
+            Key features
+          </h4>
+          <ul className="mt-4 space-y-3.5 sm:space-y-4">
+            {project.highlights.map((item) => (
+              <li
+                key={item}
+                className="border-l-2 border-ink pl-3.5 text-[0.95rem] leading-relaxed text-sea sm:pl-4 sm:text-base"
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="border-t border-ink/10 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 sm:px-8 sm:pb-4">
+          {project.url ? (
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-12 min-h-12 w-full shrink-0 items-center justify-center gap-2 bg-ink px-4 text-sm font-medium leading-none text-foam transition-colors hover:bg-sea-mid sm:h-11 sm:min-h-11"
+            >
+              Visit live site
+              <ExternalLink
+                className="size-3.5 shrink-0"
+                strokeWidth={1.75}
+                aria-hidden
+              />
+            </a>
+          ) : (
+            <button
+              type="button"
+              onClick={dismissSheet}
+              className="inline-flex h-12 min-h-12 w-full shrink-0 items-center justify-center bg-ink px-4 text-sm font-medium leading-none text-foam transition-colors hover:bg-sea-mid sm:h-11 sm:min-h-11"
+            >
+              Close
+            </button>
+          )}
+        </div>
+      </aside>
     </div>
   );
 }
@@ -92,73 +365,153 @@ export function Projects() {
           </p>
         </div>
 
-        <ul className="mt-4 border-t border-ink/10">
+        <ul className="mt-6">
           {projects.map((project, i) => (
-            <li key={project.name} className="border-b border-ink/10">
+            <li key={project.name}>
               <button
                 type="button"
                 onClick={() => setActive(project)}
-                className="group grid w-full grid-cols-[2.75rem_minmax(0,1fr)] gap-x-4 px-1 py-8 text-left transition-colors hover:bg-foam/80 sm:grid-cols-[3.25rem_minmax(0,1fr)] sm:gap-x-6 sm:px-3 sm:py-9"
+                className="group relative w-full border-b border-ink/10 px-0 py-7 text-left transition-colors first:border-t first:border-ink/10 hover:bg-foam active:bg-foam sm:py-10"
               >
-                <span className="pt-2.5 font-mono text-sm tabular-nums text-sea">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
+                <span
+                  className="absolute inset-y-0 left-0 hidden w-0.5 origin-top scale-y-0 bg-ink transition-transform duration-300 group-hover:scale-y-100 sm:block"
+                  aria-hidden
+                />
 
-                <div className="min-w-0">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex min-w-0 items-start gap-3">
-                      <div className="relative size-10 shrink-0 overflow-hidden rounded-full border border-ink/10 bg-white sm:size-11">
+                <div className="space-y-4 px-1 sm:hidden">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-mono text-xs tabular-nums text-sea">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span className="border border-ink/15 px-2 py-0.5 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-ink/70">
+                      {project.kind}
+                    </span>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="relative size-11 shrink-0 overflow-hidden rounded-full border border-ink/10 bg-white">
+                      {project.logo ? (
+                        <Image
+                          src={project.logo}
+                          alt=""
+                          fill
+                          sizes="44px"
+                          className="object-contain p-1.5"
+                        />
+                      ) : (
+                        <span
+                          className="flex size-full items-center justify-center font-mono text-[0.7rem] font-medium text-sea"
+                          aria-hidden
+                        >
+                          {project.name.slice(0, 2).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-display text-[1.35rem] font-semibold leading-tight tracking-tight text-ink">
+                        {project.name}
+                      </h3>
+                      <p className="mt-1.5 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-sea">
+                        {project.role}
+                        {project.url ? (
+                          <>
+                            <span className="mx-1.5 text-ink/25">·</span>
+                            <span className="normal-case tracking-normal text-ink/55">
+                              Live
+                            </span>
+                          </>
+                        ) : null}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-sm leading-relaxed text-sea">
+                    {project.summary}
+                  </p>
+
+                  <ProjectStackPreview stack={project.stack} limit={4} />
+
+                  <div className="flex items-center justify-between border-t border-ink/10 pt-4">
+                    <span className="text-sm font-medium text-ink">
+                      Open details
+                    </span>
+                    <span
+                      className="flex size-9 items-center justify-center bg-ink text-foam"
+                      aria-hidden
+                    >
+                      →
+                    </span>
+                  </div>
+                </div>
+
+                <div className="hidden gap-6 px-4 sm:flex">
+                  <span className="w-10 shrink-0 pt-1.5 font-mono text-sm tabular-nums text-sea">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start gap-4">
+                      <div className="relative size-12 shrink-0 overflow-hidden rounded-full border border-ink/10 bg-white">
                         {project.logo ? (
                           <Image
                             src={project.logo}
                             alt=""
                             fill
-                            sizes="44px"
+                            sizes="48px"
                             className="object-contain p-1.5"
                           />
                         ) : (
                           <span
-                            className="flex size-full items-center justify-center font-mono text-[0.65rem] font-medium text-sea"
+                            className="flex size-full items-center justify-center font-mono text-[0.7rem] font-medium text-sea"
                             aria-hidden
                           >
                             {project.name.slice(0, 2).toUpperCase()}
                           </span>
                         )}
                       </div>
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                          <h3 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
-                            {project.name}
-                          </h3>
-                          <span className="border border-ink/15 px-2 py-0.5 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-ink/70">
-                            {project.kind}
-                          </span>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="min-w-0">
+                            <h3 className="font-display text-2xl font-semibold tracking-tight text-ink transition-colors group-hover:text-sea-mid">
+                              {project.name}
+                            </h3>
+                            <p className="mt-1.5 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-sea">
+                              {project.role}
+                              {project.url ? (
+                                <>
+                                  <span className="mx-2 text-ink/25">·</span>
+                                  <span className="normal-case tracking-normal text-ink/55">
+                                    Live
+                                  </span>
+                                </>
+                              ) : null}
+                            </p>
+                          </div>
+
+                          <div className="flex shrink-0 items-center gap-2">
+                            <span className="whitespace-nowrap border border-ink/15 px-2.5 py-1 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-ink/70">
+                              {project.kind}
+                            </span>
+                            <span
+                              className="inline-flex size-9 items-center justify-center bg-ink text-sm text-foam transition-transform duration-300 group-hover:translate-x-0.5"
+                              aria-hidden
+                            >
+                              →
+                            </span>
+                          </div>
                         </div>
-                        <p className="mt-1.5 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-sea">
-                          {project.role}
-                        </p>
                       </div>
                     </div>
 
-                    <span
-                      className="flex size-9 shrink-0 items-center justify-center bg-ink text-foam transition-transform duration-300 group-hover:translate-x-0.5"
-                      aria-hidden
-                    >
-                      →
-                    </span>
+                    <p className="mt-5 max-w-2xl pl-16 text-[0.95rem] leading-relaxed text-sea">
+                      {project.summary}
+                    </p>
+
+                    <div className="mt-4 pl-16">
+                      <ProjectStackPreview stack={project.stack} />
+                    </div>
                   </div>
-
-                  <p className="mt-4 text-sm leading-relaxed text-sea sm:mt-5 sm:pl-14">
-                    {project.summary}
-                  </p>
-
-                  <div className="mt-3 sm:pl-14">
-                    <ProjectStackPreview stack={project.stack} />
-                  </div>
-
-                  <p className="mt-4 text-sm font-medium text-ink sm:sr-only">
-                    Open details
-                  </p>
                 </div>
               </button>
             </li>
@@ -167,117 +520,10 @@ export function Projects() {
       </div>
 
       {active ? (
-        <div className="fixed inset-0 z-[60] flex justify-end">
-          <button
-            type="button"
-            aria-label="Close details"
-            className="work-panel-backdrop absolute inset-0 bg-ink/45"
-            onClick={() => setActive(null)}
-          />
-          <aside
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="work-panel-title"
-            className="work-panel relative z-10 flex h-full w-full max-w-lg flex-col border-l border-ink/10 bg-foam"
-          >
-            <div className="flex items-start justify-between gap-4 border-b border-ink/10 px-6 py-5 sm:px-8">
-              <div className="flex min-w-0 items-start gap-3">
-                {active.logo ? (
-                  <div className="relative size-12 shrink-0 overflow-hidden rounded-full border border-ink/10 bg-white">
-                    <Image
-                      src={active.logo}
-                      alt={`${active.name} logo`}
-                      fill
-                      sizes="48px"
-                      className="object-contain p-1.5"
-                    />
-                  </div>
-                ) : null}
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-sea">
-                      {active.role}
-                    </p>
-                    <span className="border border-ink/15 px-2 py-0.5 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-ink/70">
-                      {active.kind}
-                    </span>
-                  </div>
-                  <h3
-                    id="work-panel-title"
-                    className="mt-2 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl"
-                  >
-                    {active.name}
-                  </h3>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActive(null)}
-                className="flex size-9 shrink-0 items-center justify-center border border-ink/15 text-ink transition-colors hover:border-ink hover:bg-mist"
-                aria-label="Close"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto px-6 py-8 sm:px-8">
-              <p className="text-base leading-relaxed text-sea">{active.summary}</p>
-
-              <h4 className="mt-10 font-display text-lg font-semibold tracking-tight text-ink sm:text-xl">
-                Technical stack
-              </h4>
-              <div className="mt-5">
-                <ProjectStackDetail stack={active.stack} />
-              </div>
-
-              <h4 className="mt-10 font-display text-lg font-semibold tracking-tight text-ink sm:text-xl">
-                Key features
-              </h4>
-              <ul className="mt-4 space-y-4">
-                {active.highlights.map((item) => (
-                  <li
-                    key={item}
-                    className="border-l-2 border-ink pl-4 text-base leading-relaxed text-sea"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="border-t border-ink/10 px-6 py-4 sm:px-8">
-              <div className="flex flex-col gap-3 sm:flex-row">
-                {active.url ? (
-                  <a
-                    href={active.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex h-11 flex-1 items-center justify-center gap-2 bg-ink text-sm font-medium text-foam transition-colors hover:bg-sea-mid"
-                  >
-                    Visit live site
-                    <ExternalLink
-                      className="size-3.5"
-                      strokeWidth={1.75}
-                      aria-hidden
-                    />
-                  </a>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={() => setActive(null)}
-                  className={cn(
-                    "inline-flex h-11 items-center justify-center text-sm font-medium transition-colors",
-                    active.url
-                      ? "flex-1 border border-ink/15 text-ink hover:border-ink hover:bg-mist"
-                      : "w-full bg-ink text-foam hover:bg-sea-mid"
-                  )}
-                >
-                  Close panel
-                </button>
-              </div>
-            </div>
-          </aside>
-        </div>
+        <ProjectDetailSheet
+          project={active}
+          onClose={() => setActive(null)}
+        />
       ) : null}
     </section>
   );

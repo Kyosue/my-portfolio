@@ -28,7 +28,7 @@ export function About() {
           <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-sea">
             Technical stack
           </p>
-          <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-8 sm:gap-8 lg:grid-cols-5">
             {skillGroups.map((group) => (
               <div key={group.label}>
                 <h3 className="font-display text-sm font-semibold text-ink">
