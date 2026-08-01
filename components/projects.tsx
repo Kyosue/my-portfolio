@@ -6,10 +6,12 @@ import { useEffect, useRef, useState } from "react";
 import {
   getStackLayers,
   getStackPreview,
+  projectPlatformMeta,
   projects,
   type Project,
   type ProjectStack,
 } from "@/lib/portfolio-data";
+import { ProjectMark, ProjectPlatformBadge } from "@/components/project-preview";
 
 function ProjectStackPreview({
   stack,
@@ -234,9 +236,15 @@ function ProjectDetailSheet({
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
+                  {project.featured ? (
+                    <span className="bg-ink px-2 py-0.5 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-foam">
+                      Featured
+                    </span>
+                  ) : null}
                   <span className="border border-ink/15 px-2 py-0.5 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-ink/70">
                     {project.kind}
                   </span>
+                  <ProjectPlatformBadge platform={project.platform} />
                   {project.url ? (
                     <span className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-sea">
                       Live
@@ -249,6 +257,9 @@ function ProjectDetailSheet({
                 >
                   {project.name}
                 </h3>
+                <p className="mt-1.5 text-sm font-medium text-ink/80">
+                  {project.category}
+                </p>
                 <p className="mt-1 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-sea">
                   {project.role}
                 </p>
@@ -351,7 +362,7 @@ export function Projects() {
   return (
     <section id="work" className="overflow-hidden bg-mist">
       <div className="shell py-20 sm:py-28">
-        <div className="flex flex-col gap-4 border-b border-ink/10 pb-10 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-3 border-b border-ink/10 pb-8 sm:flex-row sm:items-end sm:justify-between sm:gap-4 sm:pb-10">
           <div>
             <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-sea">
               01 — Work
@@ -365,110 +376,73 @@ export function Projects() {
           </p>
         </div>
 
-        <ul className="mt-6">
+        <ul className="mt-2 sm:mt-6">
           {projects.map((project, i) => (
-            <li key={project.name}>
+            <li
+              key={project.name}
+              className="animate-rise"
+              style={{ animationDelay: `${80 + i * 70}ms` }}
+            >
               <button
                 type="button"
                 onClick={() => setActive(project)}
-                className="group relative w-full border-b border-ink/10 px-0 py-7 text-left transition-colors first:border-t first:border-ink/10 hover:bg-foam active:bg-foam sm:py-10"
+                className="group relative w-full border-b border-ink/10 px-0 py-6 text-left transition-colors first:border-t first:border-ink/10 hover:bg-foam active:bg-foam sm:py-10"
               >
                 <span
-                  className="absolute inset-y-0 left-0 hidden w-0.5 origin-top scale-y-0 bg-ink transition-transform duration-300 group-hover:scale-y-100 sm:block"
+                  className="absolute inset-y-0 left-0 w-0.5 origin-top scale-y-0 bg-ink transition-transform duration-300 group-active:scale-y-100 sm:group-hover:scale-y-100"
                   aria-hidden
                 />
 
-                <div className="space-y-4 px-1 sm:hidden">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="font-mono text-xs tabular-nums text-sea">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="border border-ink/15 px-2 py-0.5 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-ink/70">
-                      {project.kind}
-                    </span>
-                  </div>
+                <div className="px-1 sm:hidden">
+                  <div className="flex gap-3.5">
+                    <div className="flex w-12 shrink-0 flex-col items-center gap-2 pt-0.5">
+                      <span className="font-mono text-[0.6rem] tabular-nums tracking-wider text-sea/80">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <ProjectMark project={project} size="md" />
+                    </div>
 
-                  <div className="flex items-start gap-3">
-                    <div className="relative size-11 shrink-0 overflow-hidden rounded-full border border-ink/10 bg-white">
-                      {project.logo ? (
-                        <Image
-                          src={project.logo}
-                          alt=""
-                          fill
-                          sizes="44px"
-                          className="object-contain p-1.5"
-                        />
-                      ) : (
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <h3 className="min-w-0 font-display text-[1.35rem] font-semibold leading-tight tracking-tight text-ink">
+                          {project.name}
+                        </h3>
                         <span
-                          className="flex size-full items-center justify-center font-mono text-[0.7rem] font-medium text-sea"
+                          className="shrink-0 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-ink/45 transition-transform duration-300 group-active:translate-x-0.5"
                           aria-hidden
                         >
-                          {project.name.slice(0, 2).toUpperCase()}
+                          View →
                         </span>
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-display text-[1.35rem] font-semibold leading-tight tracking-tight text-ink">
-                        {project.name}
-                      </h3>
-                      <p className="mt-1.5 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-sea">
-                        {project.role}
-                        {project.url ? (
-                          <>
-                            <span className="mx-1.5 text-ink/25">·</span>
-                            <span className="normal-case tracking-normal text-ink/55">
-                              Live
-                            </span>
-                          </>
+                      </div>
+
+                      <p className="mt-1.5 text-[0.8rem] font-medium leading-snug text-ink/75">
+                        {project.featured ? (
+                          <span className="text-ink">Featured · </span>
                         ) : null}
+                        {project.category}
+                      </p>
+
+                      <p className="mt-1 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-sea">
+                        {project.kind}
+                        <span className="mx-1.5 text-ink/20">·</span>
+                        {projectPlatformMeta[project.platform].label}
+                      </p>
+
+                      <p className="mt-3 line-clamp-2 text-[0.9rem] leading-relaxed text-sea">
+                        {project.summary}
                       </p>
                     </div>
                   </div>
-
-                  <p className="text-sm leading-relaxed text-sea">
-                    {project.summary}
-                  </p>
-
-                  <ProjectStackPreview stack={project.stack} limit={4} />
-
-                  <div className="flex items-center justify-between border-t border-ink/10 pt-4">
-                    <span className="text-sm font-medium text-ink">
-                      Open details
-                    </span>
-                    <span
-                      className="flex size-9 items-center justify-center bg-ink text-foam"
-                      aria-hidden
-                    >
-                      →
-                    </span>
-                  </div>
                 </div>
 
-                <div className="hidden gap-6 px-4 sm:flex">
+                <div className="hidden gap-6 px-4 sm:flex sm:items-start">
                   <span className="w-10 shrink-0 pt-1.5 font-mono text-sm tabular-nums text-sea">
                     {String(i + 1).padStart(2, "0")}
                   </span>
 
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-start gap-4">
-                      <div className="relative size-12 shrink-0 overflow-hidden rounded-full border border-ink/10 bg-white">
-                        {project.logo ? (
-                          <Image
-                            src={project.logo}
-                            alt=""
-                            fill
-                            sizes="48px"
-                            className="object-contain p-1.5"
-                          />
-                        ) : (
-                          <span
-                            className="flex size-full items-center justify-center font-mono text-[0.7rem] font-medium text-sea"
-                            aria-hidden
-                          >
-                            {project.name.slice(0, 2).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
+                    <div className="flex items-start gap-5">
+                      <ProjectMark project={project} size="md" />
 
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-4">
@@ -476,6 +450,9 @@ export function Projects() {
                             <h3 className="font-display text-2xl font-semibold tracking-tight text-ink transition-colors group-hover:text-sea-mid">
                               {project.name}
                             </h3>
+                            <p className="mt-1.5 text-sm font-medium text-ink/75">
+                              {project.category}
+                            </p>
                             <p className="mt-1.5 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-sea">
                               {project.role}
                               {project.url ? (
@@ -489,10 +466,16 @@ export function Projects() {
                             </p>
                           </div>
 
-                          <div className="flex shrink-0 items-center gap-2">
+                          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+                            {project.featured ? (
+                              <span className="whitespace-nowrap bg-ink px-2.5 py-1 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-foam">
+                                Featured
+                              </span>
+                            ) : null}
                             <span className="whitespace-nowrap border border-ink/15 px-2.5 py-1 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-ink/70">
                               {project.kind}
                             </span>
+                            <ProjectPlatformBadge platform={project.platform} />
                             <span
                               className="inline-flex size-9 items-center justify-center bg-ink text-sm text-foam transition-transform duration-300 group-hover:translate-x-0.5"
                               aria-hidden
@@ -501,15 +484,15 @@ export function Projects() {
                             </span>
                           </div>
                         </div>
+
+                        <p className="mt-5 max-w-2xl text-[0.95rem] leading-relaxed text-sea">
+                          {project.summary}
+                        </p>
+
+                        <div className="mt-4">
+                          <ProjectStackPreview stack={project.stack} />
+                        </div>
                       </div>
-                    </div>
-
-                    <p className="mt-5 max-w-2xl pl-16 text-[0.95rem] leading-relaxed text-sea">
-                      {project.summary}
-                    </p>
-
-                    <div className="mt-4 pl-16">
-                      <ProjectStackPreview stack={project.stack} />
                     </div>
                   </div>
                 </div>

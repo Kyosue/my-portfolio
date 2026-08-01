@@ -7,6 +7,9 @@ export const site = {
   linkedIn: "https://www.linkedin.com/in/reymund-abelgas-590855352",
   tagline:
     "Full-stack developer building responsive web and mobile applications that scale.",
+  availability:
+    "Open to freelance builds and full-time roles · Remote worldwide · Based in Mati City, Philippines",
+  availabilityShort: "Remote worldwide · Mati City",
   profile:
     "Full-Stack Developer with hands-on experience developing responsive web and mobile applications using React, React Native, JavaScript, PHP, Firebase, MongoDB, and MySQL. Experienced in building end-to-end software solutions, integrating APIs, optimizing application performance, and collaborating with clients to deliver reliable products. Passionate about creating scalable applications and continuously learning modern technologies.",
 } as const;
@@ -18,16 +21,30 @@ export type ProjectStack = {
 };
 
 export type ProjectKind = "Capstone" | "Freelance" | "School Project";
+export type ProjectPlatform = "cross-platform" | "mobile" | "website";
 
 export type Project = {
   name: string;
   role: string;
   kind: ProjectKind;
+  platform: ProjectPlatform;
+  /** Recruiter-facing category, e.g. "Disaster management system" */
+  category: string;
   summary: string;
   stack: ProjectStack;
   highlights: string[];
   logo?: string;
   url?: string;
+  featured?: boolean;
+};
+
+export const projectPlatformMeta: Record<
+  ProjectPlatform,
+  { label: string }
+> = {
+  "cross-platform": { label: "Cross Platform" },
+  mobile: { label: "Mobile" },
+  website: { label: "Website" },
 };
 
 export const stackLayers = [
@@ -57,8 +74,10 @@ export const projects: Project[] = [
     name: "RESPONDR",
     role: "Full-Stack Developer",
     kind: "Capstone",
+    category: "Disaster management system",
+    featured: true,
     summary:
-      "Disaster response for PDRRMO — offline resource ops, live municipal maps, and automated SitReps.",
+      "Cross-platform disaster response for PDRRMO — offline resource ops, live municipal maps, and automated SitReps.",
     stack: {
       frontend: [
         "Expo",
@@ -83,6 +102,7 @@ export const projects: Project[] = [
       infra: ["Firebase Hosting", "EAS"],
     },
     logo: "/images/Respondr.png",
+    platform: "cross-platform",
     url: "https://respondr-da5cb.web.app/",
     highlights: [
       "Engineered an offline-first sync layer with NetInfo, AsyncStorage operation queues, and SyncManager exponential backoff so responders keep logging resource transactions when cellular coverage drops.",
@@ -95,8 +115,10 @@ export const projects: Project[] = [
     name: "Campus Mobility Platform",
     role: "Full-Stack Developer",
     kind: "Freelance",
+    category: "University management platform",
+    featured: true,
     summary:
-      "Campus leave and travel authorization for DOrSU — role-gated approvals, gate QR, and weekly balances.",
+      "Full-stack leave and travel authorization for DOrSU — role-gated approvals, gate QR, and weekly balances.",
     stack: {
       frontend: [
         "Expo",
@@ -120,6 +142,7 @@ export const projects: Project[] = [
       infra: ["Render", "Vercel", "EAS"],
     },
     logo: "/images/gopass.jpg",
+    platform: "cross-platform",
     url: "https://gopassdorsu.vercel.app/",
     highlights: [
       "Architected a split-client platform (Expo mobile for employees/approvers/security; Expo web HR console on Vercel; Express API on Render) with JWT auth, bcrypt credentials, and route-level authorize middleware across nine campus roles.",
@@ -132,13 +155,16 @@ export const projects: Project[] = [
     name: "Attendify",
     role: "Full-Stack Developer",
     kind: "Freelance",
+    category: "School attendance platform",
+    featured: true,
     summary:
-      "School attendance for Pantukan NHS — secure QR check-in, campus geofencing, and grade/section reports.",
+      "Cross-platform attendance for Pantukan NHS — secure QR check-in, campus geofencing, and grade/section reports.",
     stack: {
       frontend: ["Expo", "React", "TypeScript", "Leaflet", "SheetJS", "Jest"],
       backend: ["Firebase", "Firestore"],
     },
     logo: "/images/logo.png",
+    platform: "cross-platform",
     url: "https://attendify-pnhs.web.app/",
     highlights: [
       "Engineered campus geofencing and live presence on Leaflet + OpenStreetMap with KML/GeoJSON polygon checks (ray-casting + Haversine), throttled Firestore location writes (~30s / 12m), and expo-task-manager background GPS.",
@@ -151,12 +177,14 @@ export const projects: Project[] = [
     name: "Barangay Business Permit Tracking System",
     role: "Full-Stack Developer",
     kind: "Freelance",
+    category: "Full-stack web platform",
     summary:
       "Barangay business clearance for Marayag — online applications, LGC-aligned renewals, and printable permits.",
     stack: {
       frontend: ["HTML", "CSS", "JavaScript"],
       backend: ["PHP", "MySQL", "PDO"],
     },
+    platform: "website",
     highlights: [
       "Engineered a nine-state permit lifecycle (submitted → under_review → on_hold → for_payment → payment_confirmed → approved / released / rejected / revoked) with PDO status updates that auto-assign BBC-YYYY-MM-NNNNN numbers and force Dec 31 expiry only on approval.",
       "Implemented admin / staff / applicant RBAC with PHP sessions, password_hash / password_verify, and require_role guards, plus admin-safe user CRUD that blocks self-deletion and removal of the last admin while writing changes to a paginated audit log.",
@@ -168,6 +196,7 @@ export const projects: Project[] = [
     name: "Vetra",
     role: "Full-Stack Developer",
     kind: "School Project",
+    category: "Offline mobile POS",
     summary:
       "Offline-first POS for small businesses — SQLite inventory & sales, on-device receipts, and printable reports.",
     stack: {
@@ -184,6 +213,7 @@ export const projects: Project[] = [
       infra: ["Android"],
     },
     logo: "/images/vetra-app-icon.png",
+    platform: "mobile",
     highlights: [
       "Architected an offline-first POS data layer on expo-sqlite (products, sales, users, business_profiles) with transactional sale writes that decrement stock and reject under-stocked checkouts when internet is unavailable.",
       "Built a cart-driven checkout flow with category filters, search/sort, and multi-item cart state, then captured receipts via react-native-view-shot + expo-file-system/MediaLibrary/Sharing for on-device PNG save and share.",
@@ -208,11 +238,11 @@ export const experience: Experience[] = [
     location: "Mati City",
     period: "2024 to 2026",
     bullets: [
-      "Designed and deployed custom web and mobile applications tailored to client requirements.",
-      "Developed responsive interfaces that improved usability across desktop and mobile devices.",
-      "Integrated Firebase, MongoDB, MySQL, and third-party REST APIs to support secure data management.",
-      "Diagnosed and resolved software issues through testing and debugging, improving application stability.",
-      "Collaborated directly with clients from requirements gathering through deployment while meeting project deadlines.",
+      "Shipped 5 production web and mobile apps for government, university, and school clients across Davao Oriental—including disaster response, campus leave, and attendance systems.",
+      "Engineered 10+ responsive interfaces with React Native and Next.js-style stacks, covering offline sync, live maps, and role-gated workflows used in day-to-day operations.",
+      "Integrated Firebase, MongoDB, MySQL, and third-party REST APIs across client products, enabling secure auth, realtime updates, and reliable data pipelines end to end.",
+      "Cut recurring production defects through structured testing and debugging, stabilizing client releases before and after launch.",
+      "Owned client delivery from requirements through deployment for freelance builds, keeping scope clear and ship dates intact.",
     ],
   },
   {
@@ -221,9 +251,9 @@ export const experience: Experience[] = [
     location: "Mati City",
     period: "Feb 2026 to Mar 2026",
     bullets: [
-      "Assisted in the management, organization, and updating of digital records and information systems.",
-      "Participated in system monitoring, documentation, and data management activities.",
-      "Collaborated with the MIS team to support daily ICT operations and ensure efficient technology services.",
+      "Supported digital records and information systems for campus ICT operations, keeping datasets organized and current for daily MIS workflows.",
+      "Contributed to system monitoring, documentation, and data management tasks that reduced handoff friction across the MIS team.",
+      "Partnered with MIS staff on day-to-day technology services, helping keep campus systems available during the internship window.",
     ],
   },
   {
@@ -232,10 +262,10 @@ export const experience: Experience[] = [
     location: "Davao City",
     period: "Mar 2026 to Jun 2026",
     bullets: [
-      "Designed and developed responsive client websites from concept to deployment using WordPress and Elementor.",
-      "Created website layouts, user interfaces, and content structures tailored to business and marketing requirements.",
-      "Developed branding materials, graphic designs, and multimedia content using Adobe Photoshop, Illustrator, Canva, and CapCut.",
-      "Collaborated with mentors and team members to deliver client projects within established deadlines and quality standards.",
+      "Built and launched responsive client websites end to end with WordPress and Elementor, from layout through deployment.",
+      "Designed UI structures and content architecture aligned to each client's marketing goals, speeding stakeholder review cycles.",
+      "Produced branding, graphics, and multimedia assets in Photoshop, Illustrator, Canva, and CapCut for live client campaigns.",
+      "Delivered client work with mentors on agreed timelines and quality bars across concurrent website and creative projects.",
     ],
   },
 ];

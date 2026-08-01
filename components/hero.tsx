@@ -66,7 +66,7 @@ export function Hero() {
             </p>
             <span className="hidden h-3 w-px bg-ink/15 sm:block" aria-hidden />
             <p className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-sea sm:text-[0.7rem] sm:tracking-[0.16em]">
-              Available · Mati City
+              {site.availabilityShort}
             </p>
           </div>
 
@@ -121,8 +121,7 @@ export function Hero() {
             </div>
 
             <p className="text-sm leading-relaxed text-sea">
-              Open to freelance &amp; full-time ·{" "}
-              <span className="text-ink">Mati City, Philippines</span>
+              {site.availability}
             </p>
 
             <div>
@@ -174,8 +173,7 @@ export function Hero() {
                 Currently
               </p>
               <p className="mt-3 text-sm leading-relaxed text-sea">
-                Open to freelance builds and full-time roles from{" "}
-                <span className="text-ink">Mati City, Philippines</span>.
+                {site.availability}
               </p>
             </div>
 

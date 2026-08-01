@@ -7,15 +7,14 @@ export function Contact() {
       <TechBackdrop variant="dark" />
       <div className="shell relative z-10 grid gap-12 py-20 sm:py-28 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
         <div>
-          <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-white/45">
+          <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-white/75">
             04 — Contact
           </p>
           <h2 className="mt-4 font-display text-2xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
             Tell me what you&apos;re building
           </h2>
-          <p className="mt-5 max-w-md text-base text-white/55">
-            Open to freelance projects and full-time roles. I reply to every
-            serious inquiry.
+          <p className="mt-5 max-w-md text-base text-white/80">
+            {site.availability}. I reply to every serious inquiry.
           </p>
         </div>
 
@@ -28,16 +27,16 @@ export function Contact() {
           </a>
           <a
             href={`tel:${site.phone.replace(/\s/g, "")}`}
-            className="text-base text-white/60 transition-colors hover:text-white"
+            className="text-base text-white/85 transition-colors hover:text-white"
           >
             {site.phone}
           </a>
-          <p className="text-sm text-white/40">{site.location}</p>
+          <p className="text-sm text-white/75">{site.location}</p>
           <a
             href={site.linkedIn}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs uppercase tracking-[0.16em] text-white/35 transition-colors hover:text-white"
+            className="text-xs uppercase tracking-[0.16em] text-white/75 transition-colors hover:text-white"
           >
             LinkedIn
           </a>

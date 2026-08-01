@@ -184,7 +184,7 @@ export function ResumeZoomViewer({
       ref={viewportRef}
       className="relative min-h-0 flex-1 touch-none overflow-hidden bg-mist"
     >
-      <p className="pointer-events-none absolute inset-x-0 top-1.5 z-[1] text-center font-mono text-[0.6rem] uppercase tracking-[0.12em] text-sea/70">
+      <p className="pointer-events-none absolute inset-x-0 top-1.5 z-[1] text-center font-mono text-[0.6rem] uppercase tracking-[0.12em] text-sea">
         Pinch to zoom · Double-tap
       </p>
       <div className="flex h-full items-center justify-center p-2">
