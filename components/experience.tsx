@@ -20,7 +20,7 @@ export function Experience() {
 
         <ol className="relative space-y-0">
           <div
-            className="absolute bottom-0 left-[0.4375rem] top-3 w-px bg-ink/15 md:left-[calc(10rem+0.4375rem)]"
+            className="absolute bottom-0 left-[0.3125rem] top-3 w-px -translate-x-1/2 bg-ink/15 md:left-[calc(10rem+0.3125rem)]"
             aria-hidden
           />
 
@@ -31,7 +31,7 @@ export function Experience() {
             >
               <div
                 className={cn(
-                  "absolute left-0 top-[2.85rem] z-[1] size-2.5 rounded-full border-2 border-mist bg-ink md:left-40",
+                  "absolute left-[0.3125rem] top-[2.85rem] z-[1] size-2.5 -translate-x-1/2 rounded-full border-2 border-mist bg-ink md:left-[calc(10rem+0.3125rem)]",
                   index === 0 && "ring-4 ring-ink/10"
                 )}
                 aria-hidden

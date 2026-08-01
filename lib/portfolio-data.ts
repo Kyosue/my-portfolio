@@ -291,7 +291,7 @@ export const skills = {
   frameworks: ["React Native", "Expo", "React (Vite)", "Laravel"],
   databases: ["Firebase", "MongoDB", "MySQL"],
   cloud: ["Vercel", "Netlify", "Render"],
-  tools: ["Git/GitHub", "WordPress", "Elementor", "MySQL Workbench"],
+  tools: ["Cursor", "Git/GitHub", "WordPress", "Elementor", "MySQL Workbench"],
 } as const;
 
 export const navLinks = [
