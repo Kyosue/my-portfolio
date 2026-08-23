@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Reymund Abelgas — Portfolio
+
+Personal portfolio site for a full-stack software developer based in Mati City, Philippines. Showcases featured projects, work experience, skills, and contact details in a responsive, theme-aware layout.
+
+## Features
+
+- Hero section with downloadable resume and in-browser preview
+- Featured projects with stack breakdowns and live demo links
+- Work experience and education timeline
+- Skills overview and about section
+- Contact links (email, LinkedIn, phone)
+- Dark/light theme toggle
+- Animated UI with Framer Motion
+- Vercel Analytics and Speed Insights
+
+## Stack
+
+- **Framework:** Next.js 16, React 19, TypeScript
+- **Styling:** Tailwind CSS 4, shadcn/ui
+- **Animation:** Framer Motion
+- **Theming:** next-themes
+- **Icons:** Lucide React, Hugeicons, React Icons
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies and run the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Other scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build   # Production build
+npm run lint    # Run ESLint
+```
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/              # Next.js App Router pages and layout
+components/       # UI sections (hero, projects, experience, etc.)
+lib/              # Portfolio data and utilities
+public/           # Static assets (images, resume, documents)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Portfolio content (bio, projects, experience, skills) lives in `lib/portfolio-data.ts`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deploy
 
-## Deploy on Vercel
+This project is set up for deployment on [Vercel](https://vercel.com). Connect the repository and deploy — no extra configuration required.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Private — all rights reserved.
