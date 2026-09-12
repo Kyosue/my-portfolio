@@ -37,11 +37,13 @@ export function ProjectMark({
   className?: string;
 }) {
   const dim = size === "sm" ? "size-11" : "size-12";
+  const darkLogo = project.logoTone === "dark";
 
   return (
     <div
       className={cn(
-        "relative shrink-0 overflow-hidden rounded-full border border-ink/10 bg-white",
+        "relative shrink-0 overflow-hidden rounded-full border border-ink/10",
+        darkLogo ? "bg-black" : "bg-white",
         dim,
         className
       )}
@@ -52,7 +54,7 @@ export function ProjectMark({
           alt=""
           fill
           sizes={size === "sm" ? "44px" : "48px"}
-          className="object-contain p-1.5"
+          className={darkLogo ? "object-cover" : "object-contain p-1.5"}
         />
       ) : (
         <span className="flex size-full items-center justify-center font-mono text-[0.7rem] font-medium text-sea">

@@ -229,14 +229,22 @@ function ProjectDetailSheet({
 
           <div className="flex items-start justify-between gap-3 border-b border-ink/10 px-5 pb-4 pt-3 sm:gap-4 sm:px-8 sm:py-5">
             <div className="flex min-w-0 flex-1 items-start gap-3">
-              <div className="relative size-11 shrink-0 overflow-hidden rounded-full border border-ink/10 bg-white sm:size-12">
+              <div
+                className={`relative size-11 shrink-0 overflow-hidden rounded-full border border-ink/10 sm:size-12 ${
+                  project.logoTone === "dark" ? "bg-black" : "bg-white"
+                }`}
+              >
                 {project.logo ? (
                   <Image
                     src={project.logo}
                     alt={`${project.name} logo`}
                     fill
                     sizes="48px"
-                    className="object-contain p-1.5"
+                    className={
+                      project.logoTone === "dark"
+                        ? "object-cover"
+                        : "object-contain p-1.5"
+                    }
                     draggable={false}
                   />
                 ) : (
@@ -250,7 +258,11 @@ function ProjectDetailSheet({
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  {project.featured ? (
+                  {project.current ? (
+                    <span className="bg-ink px-2 py-0.5 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-foam">
+                      Current
+                    </span>
+                  ) : project.featured ? (
                     <span className="bg-ink px-2 py-0.5 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-foam">
                       Featured
                     </span>
@@ -426,7 +438,9 @@ export function Projects() {
                       </div>
 
                       <p className="mt-1.5 text-[0.8rem] font-medium leading-snug text-ink/75">
-                        {project.featured ? (
+                        {project.current ? (
+                          <span className="text-ink">Current · </span>
+                        ) : project.featured ? (
                           <span className="text-ink">Featured · </span>
                         ) : null}
                         {project.category}
@@ -477,7 +491,11 @@ export function Projects() {
                           </div>
 
                           <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
-                            {project.featured ? (
+                            {project.current ? (
+                              <span className="whitespace-nowrap bg-ink px-2.5 py-1 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-foam">
+                                Current
+                              </span>
+                            ) : project.featured ? (
                               <span className="whitespace-nowrap bg-ink px-2.5 py-1 font-mono text-[0.65rem] font-medium uppercase tracking-[0.14em] text-foam">
                                 Featured
                               </span>

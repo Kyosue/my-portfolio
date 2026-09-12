@@ -20,7 +20,11 @@ export type ProjectStack = {
   infra?: string[];
 };
 
-export type ProjectKind = "Capstone" | "Freelance" | "School Project";
+export type ProjectKind =
+  | "Capstone"
+  | "Freelance"
+  | "School Project"
+  | "Personal Project";
 export type ProjectPlatform = "cross-platform" | "mobile" | "website";
 
 export type Project = {
@@ -34,8 +38,12 @@ export type Project = {
   stack: ProjectStack;
   highlights: string[];
   logo?: string;
+  /** Dark full-bleed brand art (e.g. black-backed mascot) */
+  logoTone?: "light" | "dark";
   url?: string;
   featured?: boolean;
+  /** Actively shipping / in progress — shown ahead of Featured */
+  current?: boolean;
 };
 
 export const projectPlatformMeta: Record<
@@ -70,6 +78,43 @@ export function getStackPreview(stack: ProjectStack, limit = 5) {
 }
 
 export const projects: Project[] = [
+  {
+    name: "TAVI",
+    role: "Full-Stack Developer",
+    kind: "Personal Project",
+    category: "Transport vehicle identification",
+    current: true,
+    featured: true,
+    summary:
+      "Mobile-first QR vehicle records for Mati City Bao-bao and tricycles — human-verified units passengers can scan in any browser, no app.",
+    stack: {
+      frontend: [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "react-easy-crop",
+        "html-to-image",
+      ],
+      backend: [
+        "Supabase Postgres",
+        "Supabase Storage",
+        "Cloudinary",
+        "Resend",
+        "HMAC sessions",
+      ],
+      infra: ["Vercel", "Upstash Redis", "next/og"],
+    },
+    logo: "/images/TAVI-Sleeping-S.png",
+    platform: "website",
+    url: "https://tavi-ph.vercel.app/",
+    highlights: [
+      "Passengers scan a sticker QR to open a live Verified page for that Bao-bao or tricycle—body number, plate, route, color, owner when allowed, and approved front/side/back photos—in any phone browser, with no app or passenger account.",
+      "Operators apply without a full account: upload one supporting document and three cropped photos, get a reference by email, then track status; on approval they receive a short-lived link to download and print the QR sticker.",
+      "Admin desk covers application review, vehicle edit/suspend/QR/takedown, report triage, audit export, and live SSE queues, secured with custom HMAC sessions instead of a third-party auth product.",
+      "Built around vehicle identity, not today’s driver: opaque tokens (no plate/owner PII in the QR), the same sticker stays valid when route or color changes, and the product stays out of GPS, chat, fares, and emergency response.",
+    ],
+  },
   {
     name: "RESPONDR",
     role: "Full-Stack Developer",
